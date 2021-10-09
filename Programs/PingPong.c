@@ -16,8 +16,8 @@ struct arguments
 {
   int *count;
   pthread_mutex_t *mutex;
-  pthread_cond_t *count_zero;
-  pthread_cond_t *count_not_zero;
+  pthread_cond_t *countZero;
+  pthread_cond_t *countNotZero;
 };
 
 // Increment function:
@@ -25,15 +25,18 @@ void *increment_work(void *arg)
 {
   struct arguments *threadArguments = (struct arguments*) arg;
   int rounds = 0;
+  int *count = threadArguments->count;
+
   pthread_mutex_lock(threadArguments->mutex);
+
   // Do one round of increments: (count value 0 -> 10)
   for(int i = 0; i < 10; i++)
   {
-    (*(threadArguments->count)) ++;
-    printf("Count is now (inc fn): %d\n", *(threadArguments->count));
+    (*count) ++;
+    printf("Count is now (inc fn): %d\n", *count);
   }
 
-  pthread_cond_signal(threadArguments->count_not_zero);
+  pthread_cond_signal(threadArguments->countNotZero);
   pthread_mutex_unlock(threadArguments->mutex);
    
   // Do two rounds of increments:
@@ -41,19 +44,20 @@ void *increment_work(void *arg)
   {
     pthread_mutex_lock(threadArguments->mutex);
     // Wait for the count value to be zero:
-    while((*(threadArguments->count)) != 0)
+    while((*count) != 0)
     {
-      pthread_cond_wait(threadArguments->count_zero, threadArguments->mutex);
+      pthread_cond_wait(threadArguments->countZero, threadArguments->mutex);
     }  
     // Increment count:  
     for(int i = 0; i < 10; i++)
     {
-      (*(threadArguments->count))++;
-      printf("Count is now (inc fn): %d\n", *(threadArguments->count));
+      (*count)++;
+      printf("Count is now (inc fn): %d\n", *count);
     }
     pthread_mutex_unlock(threadArguments->mutex);
     // Signal the decrementing thread that count is no longer zero (10):
-    pthread_cond_signal(threadArguments->count_not_zero);
+    pthread_cond_signal(threadArguments->countNotZero);
+    // always do signalling before the unlock, like in decrement_work
     rounds++;
   }
   return NULL;
