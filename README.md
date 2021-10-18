@@ -1,5 +1,5 @@
 # P-for-Parallel-Programming
-Contains **some** parallel programs that I wrote while experimenting with the POSIX threads api.
+Contains **some** parallel programs that I wrote while experimenting with the POSIX threads API.
 
 > Emphasizing on 'some', given that there are sequential programs here as well, including ones that are worser than their normal sequential run (equivalent with no threads), due to factors such as locking overhead. 
 
@@ -8,17 +8,19 @@ Contains **some** parallel programs that I wrote while experimenting with the PO
 
 - Problem/Question:
   
-Having multiple threads call a function like do_work(...) will have a non-deterministic execution. Write a program with 3 threads that call a function called do_work. Each thread will be responsible for generating a number and appending it to a buffer. Thread 1 generates number 1, thread 2 generates number 2, and thread 3 generates number 3. These numbers assigned to the threads are passed in as arguments. Each thread will store its value in a shared buffer of integers having a size of 3 elements called "buffer". When the third element is added to the buffer by either thread 1, 2 or 3, it checks to see if the sequence is "123". If not, it clears the buffer and the threads try to generate the sequence again. Once the total number of sequences of "123" reach 10, the threads should exit the function and join with the main thread. Each time you generate "123", it should be printed to the screen. You should also print out the total number of tries it took to print "123". For example, keep track of the total number of other sequences generated (including 123), as well: 321, 213, etc. You must use the usleep(500000) function once at each iteration (after each time a thread updates the buffer, but not in a critical section). Also, each time a thread adds its element to the buffer, it should print out it's corresponding number. Provided below is an example of the expected output at the end of the program's execution: (ensure that your program produces the exact same output formatting) <br>
-... <br>
-My id: 1 <br>
-My id: 3 <br>
-My id: 2 <br>
-My id: 1 <br>
-My id: 2 <br>
-My id: 3 <br>
-123 <br>
-Total sequences generated: 45 <br>
-Number of correct sequences: 10 <br>
+Having multiple threads call a function like do_work(...) will have a non-deterministic execution. Write a program with 3 threads that call a function called do_work. Each thread will be responsible for generating a number and appending it to a buffer. Thread 1 generates number 1, thread 2 generates number 2, and thread 3 generates number 3. These numbers assigned to the threads are passed in as arguments. Each thread will store its value in a shared buffer of integers having a size of 3 elements called "buffer". When the third element is added to the buffer by either thread 1, 2 or 3, it checks to see if the sequence is "123". If not, it clears the buffer and the threads try to generate the sequence again. Once the total number of sequences of "123" reach 10, the threads should exit the function and join with the main thread. Each time you generate "123", it should be printed to the screen. You should also print out the total number of tries it took to print "123". For example, keep track of the total number of other sequences generated (including 123), as well: 321, 213, etc. You must use the usleep(500000) function once at each iteration (after each time a thread updates the buffer, but not in a critical section). Also, each time a thread adds its element to the buffer, it should print out it's corresponding number. Provided below is an example of the expected output at the end of the program's execution: (ensure that your program produces the exact same output formatting)
+```
+... 
+My id: 1 
+My id: 3 
+My id: 2 
+My id: 1 
+My id: 2 
+My id: 3 
+123 
+Total sequences generated: 45
+Number of correct sequences: 10
+```  
 
 - Python script to test this program with: [test_SequenceOrder.py](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Test%20Scripts/test_SequenceCounter.py)
 
@@ -41,18 +43,20 @@ Coming to the main function, it first simply declares the array of pthreads, ini
 - Problem/Question:
   
 There is a competition to generate the sequences faster between two sets of 3 threads (6 threads in total). This extends the question above, so reuse your code and output the same information. Another 3 threads will generate the values 4, 5, 6 just like in problem one. Whichever set of 3 threads generates 10 sequences first, either "123" or "456", wins. Furthermore, whichever set of 3 threads wins, must tell the other set of threads that they have won and stop their execution. Only 1 thread must tell the other set of threads. Make functions 'do_work' for the first 3 threads and 'do_work2' for the second set of 3 threads. Use two buffers, named "buffer1" and "buffer2" respectively. You should also print out the total number of tries it took to print "123" and "456", and the total number of correct sequences that each set of 3 threads generated. One should be
-10 and the other should be less than 10. The set of 3 threads that won should print to the screen only once: "Team x won!", where x is either 1 or 2. You must use usleep(500000) for both sets of threads at each iteration (but do not sleep in a critical section). Provided below is an example of the expected output where team 2 wins: <br>
-... <br>
-My id: 5 <br>
-My id: 3 <br>
-123 <br>
-My id: 6 <br>
-456 <br>
-Team 2 won! <br>
-Total sequences generated team1: 51 <br>
-Number of correct sequences team1: 7 <br>
-Total sequences generated team2: 51 <br>
-Number of correct sequences team2: 10 <br>
+10 and the other should be less than 10. The set of 3 threads that won should print to the screen only once: "Team x won!", where x is either 1 or 2. You must use usleep(500000) for both sets of threads at each iteration (but do not sleep in a critical section). Provided below is an example of the expected output where team 2 wins:
+```
+... 
+My id: 5
+My id: 3
+123 
+My id: 6 
+456 
+Team 2 won!
+Total sequences generated team1: 51 
+Number of correct sequences team1: 7 
+Total sequences generated team2: 51 
+Number of correct sequences team2: 10
+```  
 
 - Python script to test this program with: [test_SequenceCompetition.py](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Test%20Scripts/test_SequenceCompetition.py)
 
@@ -79,19 +83,21 @@ Note that I have specified the number of threads and the number of correct seque
 
 - Problem/Question:
   
-Often it's useful to order thread execution. In this problem, we generate 10 threads - each is assigned a value 0 through 9, respectively (i.e., thread 0 is assigned value 0, thread 1 is assigned value 1, ..., and thread 9 is assigned value 9). Each thread calls a function do_work(). There is a global variable called "total". Each thread takes a turn adding its value to total, i.e., adding 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, and then adding 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 again, and so on. It must add the values in order, i.e., 5 cannot be added before 2 in a single "sequence". If you do this 22 times, the total value will be 990 ((0+1+2+3+4+5+6+7+8+9)*22=990). Write a program where each thread adds its value to total, over and over, which stops adding when total is equal to 990. After the threads join, the value of "total" should be output to the screen. You may not put your threads to sleep during the execution of the program, although feel free to use usleep() when testing and debugging. Every time a thread updates total it should output it's assigned number and the updated value of total. Provided below is the example of the expected output at the beginning and at the end: <br>
-my num: 0, total: 0 <br>
-my num: 1, total: 1 <br>
-my num: 2, total: 3 <br>
-my num: 3, total: 6 <br>
-my num: 4, total: 10 <br>
-... <br>
-my num: 6, total: 966 <br>
-my num: 7, total: 973 <br>
-my num: 8, total: 981 <br>
-my num: 9, total: 990 <br>
-Total: 990 <br>
-
+Often it's useful to order thread execution. In this problem, we generate 10 threads - each is assigned a value 0 through 9, respectively (i.e., thread 0 is assigned value 0, thread 1 is assigned value 1, ..., and thread 9 is assigned value 9). Each thread calls a function do_work(). There is a global variable called "total". Each thread takes a turn adding its value to total, i.e., adding 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, and then adding 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 again, and so on. It must add the values in order, i.e., 5 cannot be added before 2 in a single "sequence". If you do this 22 times, the total value will be 990 ((0+1+2+3+4+5+6+7+8+9)*22=990). Write a program where each thread adds its value to total, over and over, which stops adding when total is equal to 990. After the threads join, the value of "total" should be output to the screen. You may not put your threads to sleep during the execution of the program, although feel free to use usleep() when testing and debugging. Every time a thread updates total it should output it's assigned number and the updated value of total. Provided below is the example of the expected output at the beginning and at the end:
+```  
+my num: 0, total: 0
+my num: 1, total: 1 
+my num: 2, total: 3 
+my num: 3, total: 6 
+my num: 4, total: 10 
+... 
+my num: 6, total: 966 
+my num: 7, total: 973 
+my num: 8, total: 981 
+my num: 9, total: 990 
+Total: 990 
+```
+  
 - Python script to test this program with: [test_OrderedThreadExecutionAggregator.py](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Test%20Scripts/test_OrderedThreadExecutionAggregator.py)
 
 - My solution: [OrderedThreadExecutionAggregator.c](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/OrderedThreadExecutionAggregator.c)
@@ -119,31 +125,33 @@ The main function here is pretty standard again, involving initializations of th
 
 - Problem/Question:
   
-Write a program using 2 threads, which call decrement_work() and increment_work(), respectively. Maintain a shared counter that is initialized to 0. The function increment_work() increments the counter by 1 at each loop iteration, and decrement_work() decrements the counter by 1 at each loop iteration. Increment the counter value from 0 to 10 in increment_work(). Once the counter hits 10, the thread should wait. Then the decrementing thread should decrement the counter until the value is 0. Then it signals the incrementing thread that the value is 0, and then the incrementing thread begins incrementing the counter. The decrementing thread waits until it is signaled that the value is 10 and so on. The total number of increments and decrements combined is 50, such that the final value is 10, (i.e., 30 total increments and 20 total decrements). Implement this using locks and condition variables. You may not put your threads to sleep during the execution of the program. Each time a thread modifies the counter, output it to the screen. Provided below is the example of the expected output at the end of the program: <br>
-... <br>
-Count is now (inc fn): 9 <br>
-Count is now (inc fn): 10 <br>
-Count is now (dec fn): 9 <br>
-Count is now (dec fn): 8 <br>
-Count is now (dec fn): 7 <br>
-Count is now (dec fn): 6 <br>
-Count is now (dec fn): 5 <br>
-Count is now (dec fn): 4 <br>
-Count is now (dec fn): 3 <br>
-Count is now (dec fn): 2 <br> 
-Count is now (dec fn): 1 <br>
-Count is now (dec fn): 0 <br>
-Count is now (inc fn): 1 <br>
-Count is now (inc fn): 2 <br>
-Count is now (inc fn): 3 <br>
-Count is now (inc fn): 4 <br>
-Count is now (inc fn): 5 <br>
-Count is now (inc fn): 6 <br>
-Count is now (inc fn): 7 <br>
-Count is now (inc fn): 8 <br>
-Count is now (inc fn): 9 <br>
-Count is now (inc fn): 10 <br>
-
+Write a program using 2 threads, which call decrement_work() and increment_work(), respectively. Maintain a shared counter that is initialized to 0. The function increment_work() increments the counter by 1 at each loop iteration, and decrement_work() decrements the counter by 1 at each loop iteration. Increment the counter value from 0 to 10 in increment_work(). Once the counter hits 10, the thread should wait. Then the decrementing thread should decrement the counter until the value is 0. Then it signals the incrementing thread that the value is 0, and then the incrementing thread begins incrementing the counter. The decrementing thread waits until it is signaled that the value is 10 and so on. The total number of increments and decrements combined is 50, such that the final value is 10, (i.e., 30 total increments and 20 total decrements). Implement this using locks and condition variables. You may not put your threads to sleep during the execution of the program. Each time a thread modifies the counter, output it to the screen. Provided below is the example of the expected output at the end of the program: 
+```  
+...
+Count is now (inc fn): 9 
+Count is now (inc fn): 10 
+Count is now (dec fn): 9 
+Count is now (dec fn): 8 
+Count is now (dec fn): 7 
+Count is now (dec fn): 6 
+Count is now (dec fn): 5 
+Count is now (dec fn): 4 
+Count is now (dec fn): 3
+Count is now (dec fn): 2  
+Count is now (dec fn): 1 
+Count is now (dec fn): 0 
+Count is now (inc fn): 1 
+Count is now (inc fn): 2 
+Count is now (inc fn): 3 
+Count is now (inc fn): 4 
+Count is now (inc fn): 5 
+Count is now (inc fn): 6 
+Count is now (inc fn): 7 
+Count is now (inc fn): 8 
+Count is now (inc fn): 9 
+Count is now (inc fn): 10
+```
+  
 - Python script to test this program with: [test_PingPong.py](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Test%20Scripts/test_PingPong.py)
 
 - My solution: [PingPong.c](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/PingPong.c)
@@ -165,11 +173,173 @@ This simulates a ping-pong signalling trend between the incrementing thread and 
 The main function follows the usual norm, with the declaration, initialization (with the struct arguments) and joining of the two pthreads used in this program (named as incrementer and decrementer) plus the initialization and uninitialization (at the end) of the mutex lock and the two condition variables. 
 </details>
 
+<details>
+<summary> Bakery Simulation </summary>
+
+- Problem/Question:  
+
+This problem revolves around a bakery simulation: There is a bakery that exclusively bakes chocolate chip cookies and that has several bakers (represented by threads). Each baker has its own oven that is always hot, its own set of supplies and its own work area. Each baker follows the following pseudo-code:
+```
+// Baker thread
+for (int i = 0; i < 10; i++) {
+work (i.e., prepare dough, cut cookies, put them on a baking sheet etc.)
+get oven mitts from the oven mitt rack
+put cookies in the oven
+wait for cookies to be baked
+remove cookies from the oven
+put oven mitts back onto the oven mitt rack
+}  
+```
+In the pseudo-code above the “work” and “wait for cookies to be baked” operations simply print a message to standard out and then sleep a random number of microseconds (using usleep) between 0.2 and 0.5 seconds. The “put cookies in the oven” and “remove cookies from the oven” operations simply prints a message to the console. The point of this problem is to implement the “get oven mitts” and “put back oven mitts” operations, which should also print messages (which can be seen in the sample output provided below).
+
+The bakery is dysfunctional in that the owner does not want to buy oven mitts for each baker. Instead, there are 3 left-handed oven mitts and 3 right-handed oven mitts. 
+                       
+There are three kinds of bakers:
+- Left-handed bakers who require only one left-handed oven mitt.
+- Right-handed bakers who require only one right-handed oven mitt.
+- Cautious bakers who require both a left-handed and a right-handed oven mitt. A cautious baker first takes a left-handed mitt, and then takes a right-handed mitt.
+
+The bakers are named/numbered as follows:
+- Left-handed baker 0, Left-handed baker 1, Left-handed baker 2, ...
+- Right-handed baker 0, Right-handed baker 1, Right-handed baker 2, ...
+- Cautious baker 0, Cautious baker 1, Cautious baker 2, ...
+                       
+Conditions: <br>                       
+All bakers must be able to bake, one of each baker must be there for every program run, each baker (of any type) must perform its operations 10 times, and lastly they cannot use the same oven mitts at the same time. (quite similar to the dining philosophers problem, except a bit more complicated, but at the same time, a bit lenient on the conditions given that the mitts can be picked from any location)                       
+                       
+Implement a program that takes four integer command-line arguments:
+- The number of left-handed bakers
+- The number of right-handed bakers
+- The number of cautious bakers
+- A seed for the random number generator. This is so that we control “randomness” and can reproduce runs.
+
+Sample output: (after compilation) 
+```  
+./bakery 
+Usage: ./bakery <# left-handed bakers> <# right-handed bakers> <# cautious bakers> <seed> 
+./bakery 3 0 10 42 
+Invalid command-line arguments... Aborting 
+./bakery 2 4 3 42 
+[Left-handed baker 0] is working... 
+[Left-handed baker 1] is working... 
+[Right-handed baker 0] is working... 
+[Right-handed baker 2] is working...
+[Right-handed baker 1] is working...
+[Right-handed baker 3] is working...
+[Cautious baker 0] is working... 
+[Cautious baker 1] is working...
+[Cautious baker 2] is working... 
+[Left-handed baker 0] wants a left-handed mitt...
+[Left-handed baker 0] has got a left-handed mitt... 
+[Left-handed baker 0] has put cookies in the oven and is waiting... 
+[Right-handed baker 3] wants a right-handed mitt... 
+[Right-handed baker 3] has got a right-handed mitt... 
+[Right-handed baker 3] has put cookies in the oven and is waiting... 
+[Right-handed baker 2] wants a right-handed mitt... 
+[Right-handed baker 2] has got a right-handed mitt... 
+[Right-handed baker 2] has put cookies in the oven and is waiting... 
+[Right-handed baker 1] wants a right-handed mitt... 
+[Right-handed baker 1] has got a right-handed mitt... 
+[Right-handed baker 1] has put cookies in the oven and is waiting...  
+```
+  
+Additional/Extra problem: <br>
+Also, augment your code so that each baker thread keeps track of how long it has spent waiting for oven mitts, in seconds and microseconds.
+Before terminating, each thread should print its total waiting time. All time-related output should be printed to standard error (not standard output), for the python script to work and test the program correctly. 
+  
+Sample output of the program (with the extra problem's solution incorporated) when piped as input to the test script: (only printing to stderr) 
+```  
+./bakery 10 10 10 42 | python check_bakery.py
+[Left-handed baker 0] WAIT-TIME = 0.000002....  
+[Right-handed baker 6] WAIT-TIME = 0.000002....   
+[Right-handed baker 4] WAIT-TIME = 0.000002....   
+[Right-handed baker 2] WAIT-TIME = 0.221478....   
+[Left-handed baker 8] WAIT-TIME = 0.368330....   
+[Left-handed baker 5] WAIT-TIME = 0.223023....   
+[Right-handed baker 0] WAIT-TIME = 0.390276....   
+[Right-handed baker 7] WAIT-TIME = 0.356734....  
+[Left-handed baker 1] WAIT-TIME = 0.645120....   
+[Right-handed baker 8] WAIT-TIME = 0.502471....   
+[Right-handed baker 5] WAIT-TIME = 0.610743....   
+[Left-handed baker 3] WAIT-TIME = 0.638599....   
+[Right-handed baker 9] WAIT-TIME = 0.546355....   
+[Right-handed baker 1] WAIT-TIME = 0.812401....   
+[Cautious baker 1] WAIT-TIME = 1.078444....   
+... 
+[Left-handed baker 5] WAIT-TIME = 22.161475....   
+[Cautious baker 1] WAIT-TIME = 22.937144....  
+[Cautious baker 6] WAIT-TIME = 23.536521....   
+[Left-handed baker 6] WAIT-TIME = 22.850679....   
+[Cautious baker 7] WAIT-TIME = 24.094139....   
+[Cautious baker 8] WAIT-TIME = 23.458954....   
+[Cautious baker 4] WAIT-TIME = 23.221610....   
+[Cautious baker 5] WAIT-TIME = 23.525681....   
+[Left-handed baker 2] WAIT-TIME = 22.816458....   
+[Cautious baker 9] WAIT-TIME = 23.453240....   
+[Cautious baker 2] WAIT-TIME = 23.179165....   
+[Cautious baker 3] WAIT-TIME = 23.941442....   
+[Left-handed baker 7] WAIT-TIME = 23.794531....  
+[Cautious baker 0] WAIT-TIME = 24.304659....   
+[Cautious baker 6] WAIT-TIME = 24.176207....  
+[Cautious baker 8] WAIT-TIME = 23.906886....  
+Average wait times: 
+Left-handed bakers average wait time: 225.648133/10 = 22.564813 
+Right-handed bakers average wait time: 82.614483/10 = 8.261448 
+Cautious bakers average wait time: 236.740173/10 = 23.674017 
+Checking that the output is well-formatted... 
+        Detected 10 left-handed bakers 
+        Detected 10 right-handed bakers 
+        Detected 10 cautious bakers 
+Checking that every baker does its required number of operations... 
+        Every thread does what it needs to do 10 times.
+Checking that no more mitts are taken than there are available... 
+        No more mitts are used than are available. 
+Checking that bakers are able to bake at the same time... 
+        Bakers can bake concurrently. 
+No errors detected! 
+```
+  
+- Python script to test this program with: [test_BakerySimulation.py](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Test%20Scripts/test_BakerySimulation.py)
+
+- My solution: [BakerySimulation.c](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/BakerySimulation.c)
+
+- Code explanation:
+  
+Each baker thread here will have have nine standard arguments (passed on from a struct) - an integer value enacting as the thread ID, a categorical variable from an enum indicating the type of baker (left/right/cautious), a string indicating the type of baker as per the required output (for use in print statements), two integers (pointers in struct, and passed by reference or by the address from main) to keep track of the number of available left and right mitts (as a counter), two locks (for the left and right mitts separately) to ensure that the updates to those variables are atomic, and then finally two condition variables to establish a ‘wait and signal’ communication in between the threads so that the resources (left and right mitts) are used properly.
+
+In addition to these, I introduced four extra counting variables (doubles) while accounting for my answer to the extra problem (pushing the total count of arguments to 13) - one which stores the total wait time for a baker thread (for an iteration of the baking cycle), and the rest of which all store the total waiting time for each type of baker (hence three variables for the three types). 
+
+There are two helper functions I used, one to sleep for a random number of microseconds, and the other which just simply returns the elapsed time or duration in seconds and microseconds after getting the difference between the two timepoints which are collected via the two calls to the gettimeofday function (which returns the system’s clock time, with respect to the Unix Epoch), before and after the segment to be timed. They are named as random_sleep and getDuration respectively.
+
+Now for the meat of the solution, the entire baking cycle is composed under the do_work function, (following the naming convention from the previous problems, or the ones above) which has several parts to it. I begin by unpacking the struct arguments and creating local referenced copies of the shared variables from the arguments for use inside the function (variables specific to a baker and local to a thread are referenced using threadArguments, which points to the struct passed from main while creating that thread). I additionally initialize two timeval (which is a struct defined in <sys/time.h> with two members, one to get the seconds, and the other to get the microseconds) variables to use for the additional problem. 
+
+I then proceed with the first simulated action of the baking cycle under a while loop that runs for the number of iterations that is defined under the global enum and contains the entire simulation for a baker thread. The first step in baking is to work and prepare the cookies, which is just a random wait programmatically, so I make the call to my helper function random_sleep, sleeping in between 0.2 and 0.5 seconds (as per requirement) after printing that the baker/thread (with its corresponding baker type name and thread ID) is working. 
+  
+Now that the cookies have been prepared, it’s time to bake them by putting them in the oven, for which the baker has to get the oven mitts (depending on the type), which are a shared and limited resource. Since both types of mitts (left, right) are accessible and would be used by two different types of bakers each (left and cautious: left mitts, right and cautious: right mitts), I create two different code segments depending on the type of mitts. I decided to go with left mitts for the first one, meaning it will be accessible to a baker thread if its bakerType is left or cautious. I then print that the baker wants a left mitt and lock the section that follows using my lock for the left-mitt. Then I use the typical ‘wait’ logic (using pthread_cond_wait() in a while loop) with my condition variable for the left mitts by waiting for the shared resource if it is not available, i.e. if the number of available left mitts is zero. This part is where a baker has to wait, so I emplace my timing code’s start and end points before and after this while loop (for tackling the extra problem). I add the time for that iteration (and for that baker) to the respective counter variable of the baker’s type, keeping track of the total waiting time of their species. If the baker doesn’t go through the while loop (available mitts case), or if it gets a signal that the left mitts are available when waiting inside it (mitts initially not available case, but available after another baker kept them back on the rack), then I proceed to print that the baker got a left mitt, and then I decrement the number of left mitts available by one since the baker will be using that. Now that I am done with my update to availableLeftMitts, I unlock the mutex. The exact same logic follows for the right mitts, wherein I create a conditional code segment for the right-handed and cautious bakers. This second part will also be under an if (and not else if or else) since when a cautious baker goes through the process, he would require both types of mitts to be available, and not just the left mitts, i.e. he would need to go through both the code segments. 
+  
+After acquiring the mitt(s), the baker puts the cookies into his oven (given that each baker has his own, there is no resource sharing problem here) and for that I print the required statement and then sleep using random_sleep(0.2, 0.5) to simulate the cookies being baked. Post the sleep wait, I print the required statement indicating that the baker has removed the now baked cookies from the oven. For the last step in the simulation, the baker has to keep the oven mitt(s) he used back in the rack, so that the other bakers/threads can access them. For this part again, I replicate the if conditional code blocks that I used for the bakers to acquire the mitts, but here instead of waiting inside the critical section (again, the appropriate lock and condition variable should be used, depending on the type of mitt) I signal back to the waiting baker threads (using pthread_cond_signal()) after incrementing the mitt resource by one (and printing the required statement), since the baker for the current iteration is done with his work and no longer needs the mitt(s). I then include an additional step for the baker threads to report their individual wait times, as computed above (stored in a variable called currentWaitTime, indicative of the wait time for the current baker only). Note that separate locks have to be used since the resources/mitts are independent for the left-handed and right-hand bakers, and a cautious baker requires one of both. Likewise, two condition variables have to be used, to cater to each type of mitt separately.
+
+Coming to the main function, I first declare the array of pthreads following the block of code that declares the variables specifying the number of threads, and a variable for the seed, all to be passed as command-line arguments. Then I initialize my two (left and right mitt cases) mutex locks and condition variables, followed up by the two variables accounting for the number of left and right mitts, and additionally the four wait time recording variables. I then proceed to initialize the arguments struct for each type of baker, and then to create and pass the arguments for the baker threads in separate for-loops for each type of baker. Note that while all of my struct variables might appear to be shared in between all the baker threads at the first glance, they are not. Some of them have different values (bakerType and bakerTypeName) specific for a baker type, and some of them (id and waitTime) will be local to each baker thread, being passed by value and not reference (hence updates to them won’t be available outside the particular call to the do_work function). Next up, these arguments are then subsequently assigned to the baker threads that are created using pthread_create() for each baker type separately, and then joined using pthread_join() again in separate for-loops. 
+
+After this point, all the threads must have finished their work and added their individual wait times to their respective baker type’s count variable keeping tracking of their total wait time. Hence, I now print the final aggregated wait times for each type of baker (lines 306-309), which is a part of the required answer to the additional problem. Again, care has been taken to print all time-related output to stderr and not stdout, so it does not interfere when the output is piped to the python script to test against.
+
+Finally, the created mutex locks and condition variables are uninitialized and I exit the program successfully (given that it reaches that point) with an exit(0).
+
+Notes: <br>
+
+1) One thing I noticed while piping my output to grep for the pattern 'WAIT' is that it didn’t do its usual color highlighting, and then I realized that it is because I am printing to stderr as per the requirement (coming from my unbuffered/stderr-directed fprintf statement in line 157), and grep can only operate on stdout given from the operand’s stdin. (If I were to print to stdout, it would highlight the pattern here i.e. ‘WAIT’ in red, or the color fixed in my vscode settings for highlighting)
+  
+2) As can be seen/observed from the wait times in the second output provided above, the left-handed bakers have to wait much more time than the right-handed bakers, with the timings being equivalent to the wait times of the cautious bakers. This means that the left-handed ones are definitely not treated equally like the right-handed ones. This is not biased behaviour in general (or not occurring by chance/randomly), but instead rather quite logical, depending upon how I wrote my program.
+
+The reason for this unfairness is the order in which the mitts are acquired, which depends on which part (acquiring the left mitts or acquiring the right mitts) I go with first. It is specified in the problem that cautious bakers go for the left mitt first (quoting the exact specification from above - “A cautious baker first takes a left-handed mitt, and then takes a right-handed mitt.”) and thus, I wrote the code block for acquiring the left mitts first (lines 78-102) in my program. The thing is - this very same block of code is used by the cautious baker as well, (given that those bakers both require a left mitt) and thus the pthread_cond_wait() (with the condition variable and lock for the left mitt supplied) for the left-handed bakers becomes equivalent to that of the cautious bakers since the cautious bakers require both type of mitts and they’ll wait till they get the right mitt, and thus this wait would apply for the left-handed bakers as well, since they’ll be waiting for the left mitts to be returned by the cautious bakers. The right-handed bakers on the other hand have to do the least amount of waiting, given that the cautious bakers take the right mitt **after** the left mitt (here is where the order comes into play), and they don’t have to wait to acquire any other kind of mitt. If I emplaced the code block for acquiring the right mitts (lines 104-127) before the equivalent block for the left mitts, the cautious bakers would now acquire a right mitt first, and then a left mitt. This would create the exact opposite case, with the unfairness now being subjected to the right-handed bakers instead of the left-handed ones.
+   
+</details>  
+  
 # Compilation
 ```c
 gcc <filename>.c -lpthread -o <executablename>
 ```
 # Testing
 ```c
-./<executablename> | python3 <testscriptname>.py
+./<executablename> | python <testscriptname>.py
 ```
