@@ -1,5 +1,5 @@
-# P-for-Parallel-Programming
-Contains **some** parallel programs that I wrote while experimenting with the POSIX threads API.
+## P-for-Parallel-Programming
+Contains **some** parallel programs that I wrote while experimenting with the POSIX threads and OpenMP APIs.
 
 > Emphasizing on 'some', given that there are sequential programs here as well, including ones that are worser than their normal sequential run (equivalent with no threads), due to factors such as locking overhead. 
 
@@ -389,6 +389,47 @@ Inside the parallel region, I first collect the thread ID in my variable account
 
 That marks the end of the parallel region. Post this, I acquire the end-time for the entire execution of the parallel region, which as observed would be slightly more than the execution time of the slowest thread. I then calculate the execution times for all the three required benchmarks, given that I have all the required time data at this point. Then I compute the load balance by getting the absolute/positive difference of thread execution times in between thread 1 and thread 2 (or threads with IDs 0 and 1) by using a ternary operator with both cases resorting to having a greater value subtract the comparatively lower one. (could have also simply used abs() from stdlib.h) <br>
 Finally, I print all the four computed values in the format as specified in the problem statement.
+
+## Version 3.0    
+
+- Problem/Question: 
+
+Modify the previous version so that both threads compute the rows of the matrix on demand. That is, when a thread completes processing a row, it starts processing the next
+available row. (preferably time trial your code 10 times and report on the average load imbalance and the average execution time as well) <br> 
+Any improvements compared to the version in the previous problem/question? Explain.  
+  
+- My solution: [CrazyComputationV3.c](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/CrazyComputationV3.c)
+  
+- Code explanation:
+  
+This problem specifies that both threads should compute the rows of the matrix on demand, i.e. when a thread completes processing a row (being done with the for-loop computation inside the 2D array for a row), it dynamically starts processing the next row, and doesn’t wait to follow along its distributed workload, as would be assigned via static scheduling (fixed share of work for each thread). In other words, the scheduling to be followed here should be dynamic. Thus the only thing I had to change with respect to my solution for the previous problem was to modify the scheduling clause from schedule(static) to schedule(dynamic). Rest of the code is the exact same, and like I mentioned in my explanation for my answer to the previous question/problem above, the same logic applies here as well.
+
+Yes, there are improvements (as expected) with respect to my answer for version 2.0, or in general for that problem itself. The improvements with my corresponding explanation are:
+
+1) Total execution time: The threads now don’t have to wait to perform work (row-wise computations) on fixed chunks, and instead they are working on dynamically assigned chunks. For the chunks, I could go with a size (say 5 - then thread 1 will run rows 0 to 4, and thread 2 will run rows 5-9 for the start, and for the next 5 rows, either of the threads can run it depending on whichever finishes their initial 5 first. Subsequently, whichever thread is available, will keep doing the next chunks until all the work is done) but I am leaving it for the compiler to decide on the chunk size, as choosing a good one that provides optimal or close to optimal performance is usually difficult. Since the threads are not waiting to work only on their assigned iterations as in the case of static scheduling and since each loop iteration here takes a different amount of time, this (case with dynamic scheduling) tends to be much faster.
+
+2) Load balancing: Due to the nearly equal amount of work that each thread is now performing, I am getting a substantially lower value for the load imbalance with respect to what I got for the same in my results for problem 2.
+
+In conclusion, this solution is much better than the previous one(s), given that the workload is more evenly distributed, and both threads are actually truncating the overall execution time of the program like a good parallel program should, or is expected to.  
+
+## Version 4.0  
+
+- Problem/Question:  
+  
+Create a new program that implements version 3.0 using Pthreads. Only omp_get_wtime() may be used from the OpenMP library. You may modify the program to use global variables. (again, preferably time trial your code 10 times and report on the average load imbalance and the average execution time as well) <br>
+Any improvements compared to version 2.0 or 3.0? Explain.
+  
+- My solution: [CrazyComputationV4.c](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/CrazyComputationV4.c)
+  
+- Code explanation:  
+  
+I start by declaring some global variables, which include a mutex lock, a variable to keep track of the current row which can be accessed by both the threads dynamically (maximum value for that would be one minus the size of the rows in the 2D array), the matrix itself, and then three variables to store and account for the time-keeping for the two threads - i.e., one to account for the common start-point, and two to account for their respective end-points.
+
+In my main function, I initialize the global mutex lock and then create the two pthreads with their respective thread IDs passed as arguments (0 and 1 for threads one and two) for the start routine or the function to be executed upon thread creation, which is do_work(). The threads are then joined, following their computations to be done. This entire chunk of code right before thread creation and after joining is timed using two calls to omp_get_wtime() accordingly (timings collected before and after). The common start-point  variable is global (gets assigned the time value before thread creation) and the end-point demarking variable for the total execution time is created after the threads are joined (both values initialized within main) since it has to account for the time the threads took, which if we were to compare to my OpenMP version, would make this thread creation and joining portion the ‘parallel region’. Post thread-joining, all the benchmark data would be available, with the global variables accounting for the end-point timings of the threads being updated. Hence, I proceed to calculate the remaining three metrics, namely the thread execution/response time for thread one and thread two, and then the load imbalance, which is the absolute/positive difference of those two - all of them calculated and printed accordingly just like in the previous two problems (same code). Finally, I uninitialize my mutex lock and then exit the program.
+
+Inside my do_work function, I create a temporary variable to hold onto the value for my current row for a particular thread locally, and then I collect the thread ID in an integer variable, after receiving it from main during thread creation, again for a particular thread. I then loop until I go through all the rows (0 to 49) which is a condition which can be fulfilled by either thread, depending on who does the 50th row. Inside it I start with a check to see if the current row count is greater than the defined row dimension for the matrix, in which case I must exit the function as all work is done. Post that, I assign the value for my local row variable to be the (global) current row, and then I increment the later as I will operate on that row with the crazy computation, and it’s good to go for one row. Since this involves reading and then updating, I lock this part using my global mutex variable (so the other thread will keep waiting if one is executing this bit, in order to avoid race conditions and make this thread-safe). Next, I simply loop over the columns (using a for-loop) and perform the crazy computation (along with the printing of dots/periods, much like to show the rate of computation, which decreases gradually as each iteration takes more time progressively) for my local current row (thread-specific). At last, after all the iterations have been done (post the for-loop inside the while loop), I now collect the end-point times for both the threads separately and accordingly using an if-else conditional based on the thread ID. Now that these global variables are updated and there is nothing left to do, I just return null and exit the function. 
+
+This is the exact same as my solution to version 3.0, except without the use of OpenMP’s parallelism constructs, and with the use of pthreads instead. Hence, the execution times and the load imbalance is approximately the same when compared. Whereas when compared to version 2.0, the same improvements apply as I mentioned in my explanation for my answer to the problem in version 3.0.  
   
 Extras:
   
@@ -396,11 +437,11 @@ Extras:
   
 </details>
   
-# Compilation
+## Compilation
 ```c
 gcc <filename>.c -lpthread -o <executablename>
 ```
-# Testing
+## Testing
 ```c
 ./<executablename> | python <testscriptname>.py
 ```
