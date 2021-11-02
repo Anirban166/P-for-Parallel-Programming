@@ -335,6 +335,67 @@ The reason for this unfairness is the order in which the mitts are acquired, whi
    
 </details>  
   
+<details>
+<summary> Crazy Computation </summary>
+
+## Version 1.0
+ 
+- Problem/Question:
+  
+Using OpenMP, write a parallel version of a program which involves some crazy math computation (with progressively increasing computation-times) on a matrix of size 50 by 50, printing dots for each iteration which does a row-computation. Make it such that 2 threads are used. In this question, make it so that the first thread computes the top part of the array (i.e., rows 0 to 24) and the second thread computes the bottom part of the array (i.e., rows 25 to 49). Your program must report the execution time for the parallel chunk of code. (optionally, also report the time as an average of 10 trials by running your program 10 times and manually averaging the results later on)
+  
+Sample output:  
+```
+....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+Elapsed time: 19.14983 seconds
+```  
+  
+- My solution: [CrazyComputationV1.c](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/CrazyComputationV1.c)
+  
+- Code explanation: 
+  
+As per the requirements, I first set my number of threads to 2 and then create a parallel block of code for the two provided for-loops (inside the main function of the supplied code) by a combination of the omp directives parallel and for (followed by a #pragma, which specifies and provides additional information to the compiler on how to process that block of code). The loop variables are made private to avoid race conditions (messed up indices) and the 2D array is explicitly specified as shared, given that it needs to have shared access by both the threads running in the parallel region. Note that the for directive is operating on the outer for-loop, and that OpenMP distributes the iterations of the for-loop following the #pragma omp parallel for directive across all threads, which in our case would be between thread number one and two.
+  
+Inside the loops, a math computation is done by the do_crazy_computation function which gradually becomes more time consuming for larger values of the parameters passed onto the function (which are in this case, the loop variables) i.e. as the iterations progress, the execution takes more time. This can be observed by looking at the rate at which the dots/periods are printed onto stderr. By default, OpenMP performs static scheduling, but I explicitly stated it by mentioning the schedule(static) clause in my directive anyway. This divides the work for both the threads equally, i.e. here in terms of loop iterations and row computations for our for-loops. The first thread will compute rows 0 to 24 for the matrix, and the second will compute rows 25 to 49 (25 or 50/2 each). The entire parallel region is enclosed within two calls to omp_get_wtime() which are used to time the section (total execution time) by getting the difference of the two variables that store the values returned by the function.  
+
+## Version 2.0  
+  
+- Problem/Question: 
+
+Modify the program from version 1.0 above, so that it computes (and outputs) the load imbalance, which is the absolute value of the difference between the completion times of the two threads. The execution time of each thread should also be printed.
+
+Sample output:  
+```
+....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+Total Time (sanity check): 19.667371 seconds
+Time Thread1: 2.390382 seconds
+Time Thread2: 19.667208 seconds
+Load imbalance: 17.276826 seconds   
+```   
+  
+In the above run, one thread ran for 19.67 seconds and the other for 2.39 seconds, for a high load imbalance of 17.28 seconds. The 'Total Time' above timed everything just to double check that time times for each thread make sense. The total time should be a little bit more than the time of the thread that executes the longest. This requires a little bit of creativity given the rigidity of OpenMP. Use separate #pragma omp parallel and #pragma omp for directives. The nowait option for #pragma omp for likely comes in handy.   
+  
+- My solution: [CrazyComputationV2.c](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/CrazyComputationV2.c)
+  
+- Code explanation:    
+
+With respect to the previous problem, the main difference here is getting the execution times of the two threads, for which I am using the omp directives parallel and for like before, but separately to account for that. 
+
+Since I need to time both the threads and the total execution time, I create two additional variables to store the end time (via calls to omp_get_wtime()) for the two threads. I also introduce a variable to get the thread ID or the integer number corresponding to the thread value (starts from 0), as I use that to later check and ascertain which thread is running the parallel section. All of these variables are declared before the parallel region, of course.
+
+I define the parallel region using #pragma omp parallel followed by the private and shared variables. For the private ones, I include the loop variables (same rationale as I mentioned for the previous version) and my variable that accounts for the thread ID here since it should be specific and private to each thread. For the shared variables, I am including the 2D array (again, same reason as before) and in addition, the two variables which will store the end-time values for their respective threads. Note that I don’t have to declare separate variables to hold the start-time value since the initial time point would be essentially the same for every timing we measure.
+
+Inside the parallel region, I first collect the thread ID in my variable accounting for it by a call to the omp_get_thread_num function. Then I proceed to parallelize the outer for-loop using the omp for directive like before, except this time I add the nowait clause for the threads to avoid the default synchronization after they finish executing the work in the for-loops. I do this because I want my threads to exit my #pragma omp for directive at their own times (which would be different here, especially with static scheduling) when they finish their work, instead of waiting for the other thread (given there’s only 2) to finish. This ensures they will run the code ahead in the parallel region (outside for) at their own pace, individually. What lies next is just a simple check to see if the thread ID is 0 or 1 (or going by my variable-naming conventions, thread 1 or 2). In either case, the corresponding end-time capturing variable should make a call to omp_get_wtime(), as that particular thread would have finished its work when it reaches that point. 
+
+That marks the end of the parallel region. Post this, I acquire the end-time for the entire execution of the parallel region, which as observed would be slightly more than the execution time of the slowest thread. I then calculate the execution times for all the three required benchmarks, given that I have all the required time data at this point. Then I compute the load balance by getting the absolute/positive difference of thread execution times in between thread 1 and thread 2 (or threads with IDs 0 and 1) by using a ternary operator with both cases resorting to having a greater value subtract the comparatively lower one. (could have also simply used abs() from stdlib.h) <br>
+Finally, I print all the four computed values in the format as specified in the problem statement.
+  
+Extras:
+  
+- R script which prints the results of ten runs (or time trials) in a tabular format: [CrazyComputation_results.r](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Test%20Scripts/CrazyComputation_results.r)  
+  
+</details>
+  
 # Compilation
 ```c
 gcc <filename>.c -lpthread -o <executablename>
