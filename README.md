@@ -439,7 +439,7 @@ Extras:
   
 ## Compilation
 ```c
-gcc <filename>.c -lpthread -o <executablename>
+gcc -fopenmp <filename>.c -lpthread -o <executablename>
 ```
 ## Testing
 ```c
