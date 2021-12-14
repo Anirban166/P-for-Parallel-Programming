@@ -433,7 +433,7 @@ This is the exact same as my solution to version 3.0, except without the use of 
   
 Extras:
   
-- R script which prints the results of ten runs (or time trials) in a tabular format: [CrazyComputation_results.r](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Test%20Scripts/CrazyComputation_results.r)  
+- R script which prints the results of ten runs (or time trials) in a tabular format: [results_CrazyComputation.r](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Test%20Scripts/CrazyComputation_results.r)  
   
 </details>
   
