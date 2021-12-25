@@ -1,7 +1,8 @@
-## P-for-Parallel-Programming
-Contains **some** parallel programs that I wrote while experimenting with the POSIX threads and OpenMP APIs.
+## General
 
-> Emphasizing on 'some', given that there are sequential programs here as well, including ones that are worser than their normal sequential run (equivalent with no threads), due to factors such as locking overhead. 
+This repository contains some parallel programs that I wrote while experimenting with the POSIX threads and OpenMP APIs, aiming to solve a particular problem or tackle a scenario given by a problem statement. This readme contains a comprehensive section for each of these problems, with links to the programs accompanied by my explanations. 
+
+## Problems
 
 <details>
 <summary> Sequence Generation </summary>
@@ -436,12 +437,38 @@ Extras:
 - R script which prints the results of ten runs (or time trials) in a tabular format: [results_CrazyComputation.r](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Test%20Scripts/CrazyComputation_results.r)  
   
 </details>
-  
+
+<details>
+<summary> Count Distances Less Than Epsilon </summary>
+
+- Problem and Code explanation: 
+
+Read my [blog post](https://anirban166.github.io/An-Optimization-Problem/). Also, the one pertaining to the [GPU version](https://anirban166.github.io/GPGPU-Computing/). 
+
+- My solutions: (includes my penultimate approach for the optimized version) <br>
+[CountDistancesLessThanEpsilonBFV.c](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/CountDistancesLessThanEpsilonBFV.c) and [CountDistancesLessThanEpsilonBFV.cu](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/CountDistancesLessThanEpsilonBFV.cu), [CountDistancesLessThanEpsilonOV.c](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/CountDistancesLessThanEpslionOV.c) and [CountDistancesLessThanEpsilonOV.cu](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Programs/CountDistancesLessThanEpsilonOV.cu)
+
+Extras:
+
+- Shell scripts used to allocate resources on the compute cluster (Monsoon), accordingly schedule my desired instructions and run the programs (three times each): [CPU script (16 cores).sh](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Runner%20Scripts/CPU%20scipt%20(16%20cores).sh), [GPU script (Volta gen, v100).sh](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/Runner%20Scripts/GPU%20script%20(Volta%20gen%2C%20v100).sh)
+
+</details>
+
 ## Compilation
 ```c
 gcc -fopenmp <filename>.c -lpthread -o <executablename>
+```
+```cu
+nvcc -arch=compute_<computecapability> -code=sm_<computecapability> -lcuda -Xcompiler -fopenmp <filename>.cu -o <executablename>
 ```
 ## Testing
 ```c
 ./<executablename> | python <testscriptname>.py
 ```
+## Scheduling (Slurm)
+```sh
+sbatch <runnerscriptname>.sh
+```
+
+## License
+The code/content in this repository is licensed as per the terms and conditions laid out in [this file](https://github.com/Anirban166/P-for-Parallel-Programming/blob/main/License.md).
